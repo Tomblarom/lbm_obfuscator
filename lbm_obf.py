@@ -1,4 +1,5 @@
 import re
+import sys
 import string
 import keyword
 # List of special constructs and functions to preserve
@@ -160,41 +161,46 @@ def remove_unnecessary_whitespace(code):
 	
     return code.strip()
 
-# Read the input file
-with open('float-accessories.lisp', 'r') as file:
-    original_code = file.read()
+def main():
+    # Read the input file
+    with open(sys.argv[1], 'r') as file:
+        original_code = file.read()
 
-# Get the original file size
-original_size = len(original_code)
+    # Get the original file size
+    original_size = len(original_code)
 
-# Remove comments
-code_without_comments = remove_comments(original_code)
+    # Remove comments
+    code_without_comments = remove_comments(original_code)
 
-# Minimize the code
-minimized_code, name_mapping = minimize_names(code_without_comments)
+    # Minimize the code
+    minimized_code, name_mapping = minimize_names(code_without_comments)
 
-# Remove unnecessary whitespace
-minimized_code = remove_unnecessary_whitespace(minimized_code)
+    # Remove unnecessary whitespace
+    minimized_code = remove_unnecessary_whitespace(minimized_code)
 
-# Get the minimized file size
-minimized_size = len(minimized_code)
+    # Get the minimized file size
+    minimized_size = len(minimized_code)
 
-# Write the minimized code to a new file
-with open('float-accessories-minimized-code.lisp', 'w') as file:
-    file.write(minimized_code)
+    # Write the minimized code to a new file
+    out = sys.argv[1].replace('.lbm', '_obf.lbm')
+    with open(out, 'w') as file:
+        file.write(minimized_code)
 
-# Print the name mapping for reference
-print("Name mapping:")
-for original, short in name_mapping.items():
-    print(f"{original} -> {short}")
+    # Print the name mapping for reference
+    print("Name mapping:")
+    for original, short in name_mapping.items():
+        print(f"{original} -> {short}")
 
-# Calculate and print compression statistics
-bytes_saved = original_size - minimized_size
-compression_ratio = (bytes_saved / original_size) * 100
+    # Calculate and print compression statistics
+    bytes_saved = original_size - minimized_size
+    compression_ratio = (bytes_saved / original_size) * 100
 
-print(f"\nOriginal size: {original_size} bytes")
-print(f"Minimized size: {minimized_size} bytes")
-print(f"Bytes saved: {bytes_saved} bytes")
-print(f"Compression ratio: {compression_ratio:.2f}%")
+    print(f"\nOriginal size: {original_size} bytes")
+    print(f"Minimized size: {minimized_size} bytes")
+    print(f"Bytes saved: {bytes_saved} bytes")
+    print(f"Compression ratio: {compression_ratio:.2f}%")
 
-print("\nMinimized code has been written to 'minimized_code.lisp'")
+    print(f"\nMinimized code has been written to {out}")
+
+if __name__ == '__main__':
+    main()
