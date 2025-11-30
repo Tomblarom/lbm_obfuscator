@@ -2,6 +2,7 @@ import re
 import sys
 import string
 import keyword
+import random
 # List of special constructs and functions to preserve
 # Has some hacks such as including preserved words in strings (instead of proper regex to ignore things in between quotes), including import statement and new line inclusions for import statement.
 preserved_names = [
@@ -65,15 +66,24 @@ imported_names = [
 
 all_preserved_names = preserved_names + imported_names
 
-def generate_short_names():
+OBFUSCATION_FIRST_CHARS = string.ascii_letters + "+-*/=<>#!"
+OBFUSCATION_REST_CHARS = string.ascii_letters + string.digits + "+-*/=<>!?_"
+SYMBOL_CHARS = "+-*/=<>!?_#"
+FORBIDDEN_SYMBOLS = {op.lower() for op in ('+', '-', '*', '/', '//', '<', '<=', '>', '>=', '=', '==', '!=', 'and', 'or', 'not')}
+
+def generate_short_names(reserved_lower):
     # Generate short names: a, b, c, ..., z, aa, ab, ac, ...
     chars = string.ascii_lowercase
-    for length in range(1, 4):  # Adjust range for longer names if needed
-        yield from (
-            ''.join(combination)
-            for combination in generate_combinations(chars, length)
-            if ''.join(combination) not in keyword.kwlist and ''.join(combination) not in all_preserved_names
-        )
+    length = 1
+    while True:
+        for combination in generate_combinations(chars, length):
+            candidate = ''.join(combination)
+            key = candidate.lower()
+            if candidate in keyword.kwlist or key in reserved_lower:
+                continue
+            reserved_lower.add(key)
+            yield candidate
+        length += 1
 
 def generate_combinations(chars, length):
     if length == 1:
@@ -84,11 +94,47 @@ def generate_combinations(chars, length):
             for suffix in generate_combinations(chars, length - 1):
                 yield (char,) + suffix
 
+def _looks_like_integer(name):
+    if name.isdigit():
+        return True
+    if len(name) > 1 and name[0] in '+-' and name[1:].isdigit():
+        return True
+    return False
+
+def _has_required_mix(name):
+    has_lower = any(c.islower() for c in name)
+    has_upper = any(c.isupper() for c in name)
+    has_digit = any(c.isdigit() for c in name)
+    has_symbol = any(c in SYMBOL_CHARS for c in name)
+    categories = sum((has_lower, has_upper, has_digit, has_symbol))
+    return categories >= 2
+
+def generate_obfuscated_names(reserved_lower):
+    length = 2  # ensure enough room for mixed characters
+    while True:
+        attempts = 0
+        max_attempts = 5000
+        while attempts < max_attempts:
+            attempts += 1
+            first = random.choice(OBFUSCATION_FIRST_CHARS)
+            rest = ''.join(random.choice(OBFUSCATION_REST_CHARS) for _ in range(length - 1))
+            candidate = first + rest
+            key = candidate.lower()
+            if _looks_like_integer(candidate):
+                continue
+            if not _has_required_mix(candidate):
+                continue
+            if key in reserved_lower or key in FORBIDDEN_SYMBOLS or candidate in keyword.kwlist:
+                continue
+            reserved_lower.add(key)
+            yield candidate
+        length += 1
+
 def remove_comments(code):
     # Remove comments (everything from ; to the end of the line)
     return re.sub(r';.*$', '', code, flags=re.MULTILINE)
 
-def minimize_names(code):
+def minimize_names(code, use_obfuscator=False):
     # Find all variable names (excluding those starting with @)
     name_pattern = r'\b(?!@)([a-zA-Z@][a-zA-Z0-9@-]*)\b'  # Updated pattern to include @ in names
     names = re.findall(name_pattern, code)
@@ -97,22 +143,37 @@ def minimize_names(code):
     constant_pattern = r'\b[A-Z][A-Z0-9_]+\b'
     constants = re.findall(constant_pattern, code)
     
-    # Create a mapping of original names to short names
-    short_names = generate_short_names()
-    name_map = {name: next(short_names) for name in set(names + constants) 
-                if name not in all_preserved_names}
+    reserved_lower = {name.lower() for name in all_preserved_names}
+    seen_keys = set()
+    replacement_order = []
+    for name in names + constants:
+        if name.startswith('@'):
+            continue
+        key = name.lower()
+        if key in reserved_lower or key in seen_keys:
+            continue
+        seen_keys.add(key)
+        replacement_order.append((key, name))
+
+    generator = generate_obfuscated_names(reserved_lower) if use_obfuscator else generate_short_names(reserved_lower)
+    lower_map = {}
+    display_map = {}
+    for key, original in replacement_order:
+        new_name = next(generator)
+        lower_map[key] = new_name
+        display_map[original] = new_name
     
     # Replace names in the code
     def replace_name(match):
         name = match.group(0)
         if name.startswith('@'):
             return name  # Preserve names starting with @
-        return name_map.get(name, name)  # Replace name if it exists in the mapping
+        return lower_map.get(name.lower(), name)
 
     code = re.sub(name_pattern, replace_name, code)
     code = re.sub(constant_pattern, replace_name, code)
     
-    return code, name_map
+    return code, display_map
 	
 def remove_unnecessary_whitespace(code):
     # Remove leading/trailing whitespace from each line
@@ -157,8 +218,8 @@ def main():
     # Remove comments
     code_without_comments = remove_comments(original_code)
 
-    # Minimize the code
-    minimized_code, name_mapping = minimize_names(code_without_comments)
+    # Minimize (and optionally obfusecate) the code
+    minimized_code, name_mapping = minimize_names(code_without_comments, use_obfuscator=False)
 
     # Remove unnecessary whitespace
     minimized_code = remove_unnecessary_whitespace(minimized_code)
