@@ -59,7 +59,9 @@ preserved_names = [
 ]
 
 # Automatically managed via update_preserved_names.py. Keep manual edits in preserved_names.
-imported_names = ['puts', 'set-print-prefix', 'set-fw-name', 'timeout-reset', 'get-ppm', 'get-ppm-age', 'set-servo', 'get-vin', 'select-motor', 'get-selected-motor', 'set-bms-chg-allowed', 'bms-force-balance', 'bms-zero-offset', 'bms-st', 'get-adc', 'override-temp-motor', 'get-adc-decoded', 'set-aux', 'get-imu-rpy', 'get-imu-quat', 'get-imu-acc', 'get-imu-gyro', 'get-imu-mag', 'get-imu-acc-derot', 'get-imu-gyro-derot', 'recv-data', 'get-remote-state', 'stats', 'set-odometer', 'stats-reset', 'main-init-done', 'shutdown-hold', 'override-speed', 'app-adc-detach', 'app-adc-override', 'app-adc-range-ok', 'app-ppm-detach', 'app-ppm-override', 'app-disable-output', 'app-is-output-disabled', 'app-pas-get-rpm', 'set-current', 'set-current-rel', 'set-duty', 'set-brake', 'set-brake-rel', 'set-handbrake', 'set-handbrake-rel', 'set-rpm', 'set-pos', 'foc-openloop', 'foc-openloop-phase', 'set-kill-sw', 'foc-beep', 'foc-play-tone', 'foc-play-samples', 'foc-play-stop', 'get-current', 'get-current-dir', 'get-current-in', 'get-id', 'get-iq', 'get-id-set', 'get-iq-set', 'get-vd', 'get-vq', 'get-est-lambda', 'get-est-res', 'get-est-ind', 'get-hfi-res', 'get-duty', 'get-rpm', 'get-rpm-fast', 'get-rpm-faster', 'get-rpm-set', 'get-pos', 'get-temp-fet', 'get-temp-mot', 'get-speed', 'get-speed-set', 'get-dist', 'get-dist-abs', 'get-batt', 'get-fault', 'get-ah', 'get-wh', 'get-ah-chg', 'get-wh-chg', 'get-encoder', 'set-encoder', 'get-encoder-error-rate', 'encoder-index-found', 'pos-pid-now', 'pos-pid-set', 'pos-pid-error', 'phase-motor', 'phase-encoder', 'phase-hall', 'phase-observer', 'observer-error', 'phase-all', 'enc-corr', 'enc-corr-en', 'enc-sample', 'setup-ah', 'setup-ah-chg', 'setup-wh', 'setup-wh-chg', 'setup-current', 'setup-current-in', 'setup-num-vescs', 'can-msg-age', 'canset-current', 'canset-current-rel', 'canset-duty', 'canset-brake', 'canset-brake-rel', 'canset-rpm', 'canset-pos', 'canget-current', 'canget-current-in', 'canget-temp-fet', 'canget-temp-motor', 'canget-speed', 'canget-dist', 'canget-ppm', 'can-list-devs', 'can-ping', 'can-local-id', 'can-update-baud', 'can-send-sid', 'can-send-eid', 'can-recv-sid', 'can-recv-eid', 'can-start', 'can-stop', 'can-use-vesc', 'canmsg-recv', 'canmsg-send', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'atan2', 'pow', 'sqrt', 'log', 'log10', 'deg2rad', 'rad2deg', 'throttle-curve', 'rand', 'rand-max', 'raw-adc-current', 'raw-adc-voltage', 'raw-mod-alpha', 'raw-mod-beta', 'raw-mod-alpha-measured', 'raw-mod-beta-measured', 'raw-hall', 'uart-write', 'uart-read-bytes', 'uart-read-until', 'uartcomm-start', 'uartcomm-stop', 'i2c-start', 'i2c-tx-rx', 'i2c-restore', 'i2c-detect-addr', 'imu-start-lsm6', 'imu-stop', 'gpio-read', 'gpio-hold', 'gpio-hold-deepsleep', 'pwm-start', 'pwm-stop', 'pwm-set-duty', 'icu-start', 'icu-width', 'icu-period', 'as5047x-init', 'as5047x-deinit', 'as5047x-angle', 'conf-set', 'conf-store', 'store-backup', 'conf-detect-foc', 'conf-set-pid-offset', 'conf-measure-res', 'conf-measure-ind', 'conf-restore-mc', 'conf-restore-app', 'conf-dc-cal', 'conf-dc-cal-set', 'conf-enc-sincos', 'conf-get-limits', 'conf-detect-lambda-enc', 'conf-detect-hall', 'loopfor', 'foldl', 'foldr', 'zipwith', 'sort', 'str-join', 'str-to-i', 'str-to-f', 'str-cmp-asc', 'str-cmp-dsc', 'str-len', 'str-find', 'to-str-delim', 'bufclear', 'buf-resize', 'load-native-lib', 'unload-native-lib', 'uavcan-last-rawcmd', 'uavcan-last-rpmcmd', 'lbm-set-quota', 'lbm-set-gc-stack-size', 'image-save', 'mutex-create', 'mutex-lock', 'mutex-unlock', 'plot-init', 'plot-add-graph', 'plot-set-graph', 'plot-send-points', 'ioboard-get-adc', 'ioboard-get-digital', 'ioboard-set-digital', 'ioboard-set-pwm', 'log-config-field', 'log-start', 'log-stop', 'log-send-f32', 'log-send-f64', 'gnss-lat-lon', 'gnss-height', 'gnss-speed', 'gnss-hdop', 'gnss-date-time', 'gnss-age', 'ublox-init', 'nmea-parse', 'set-pos-time', 'cmds-start-stop', 'cmds-proc', 'esp-now-recv', 'wifi-get-bw', 'wifi-set-bw', 'wifi-stop', 'wifi-start', 'f-connect', 'f-connect-nand', 'f-disconnect', 'f-open', 'f-close', 'f-read', 'f-readline', 'f-write', 'f-tell', 'f-seek', 'f-mkdir', 'f-rm', 'f-ls', 'f-size', 'f-rename', 'f-sync', 'f-fatinfo', 'fw-erase', 'fw-write', 'fw-reboot', 'fw-info', 'fw-data', 'fw-write-raw', 'lbm-erase', 'qml-erase', 'lbm-write', 'qml-write', 'lbm-run', 'rgbled-deinit', 'color-add', 'color-sub', 'color-scale', 'unzip', 'zip-ls', 'aes-ctr-crypt', 'sleep-deep', 'sleep-light', 'sleep-config-wakeup-pin', 'rtc-data', 'connected-wifi', 'connected-hub', 'connected-ble', 'connected-usb', 'nvs-erase', 'nvs-qml-erase', 'nvs-qml-init', 'nvs-read', 'nvs-qml-read', 'nvs-write', 'nvs-qml-write', 'nvs-qml-erase-partition', 'nvs-list', 'nvs-qml-list']
+imported_names = [
+    'puts', 'set-print-prefix', 'set-fw-name', 'timeout-reset', 'get-ppm', 'get-ppm-age', 'set-servo', 'get-vin', 'select-motor', 'get-selected-motor', 'set-bms-chg-allowed', 'bms-force-balance', 'bms-zero-offset', 'bms-st', 'get-adc', 'override-temp-motor', 'get-adc-decoded', 'set-aux', 'get-imu-rpy', 'get-imu-quat', 'get-imu-acc', 'get-imu-gyro', 'get-imu-mag', 'get-imu-acc-derot', 'get-imu-gyro-derot', 'recv-data', 'get-remote-state', 'stats', 'set-odometer', 'stats-reset', 'main-init-done', 'shutdown-hold', 'override-speed', 'app-adc-detach', 'app-adc-override', 'app-adc-range-ok', 'app-ppm-detach', 'app-ppm-override', 'app-disable-output', 'app-is-output-disabled', 'app-pas-get-rpm', 'set-current', 'set-current-rel', 'set-duty', 'set-brake', 'set-brake-rel', 'set-handbrake', 'set-handbrake-rel', 'set-rpm', 'set-pos', 'foc-openloop', 'foc-openloop-phase', 'set-kill-sw', 'foc-beep', 'foc-play-tone', 'foc-play-samples', 'foc-play-stop', 'get-current', 'get-current-dir', 'get-current-in', 'get-id', 'get-iq', 'get-id-set', 'get-iq-set', 'get-vd', 'get-vq', 'get-est-lambda', 'get-est-res', 'get-est-ind', 'get-hfi-res', 'get-duty', 'get-rpm', 'get-rpm-fast', 'get-rpm-faster', 'get-rpm-set', 'get-pos', 'get-temp-fet', 'get-temp-mot', 'get-speed', 'get-speed-set', 'get-dist', 'get-dist-abs', 'get-batt', 'get-fault', 'get-ah', 'get-wh', 'get-ah-chg', 'get-wh-chg', 'get-encoder', 'set-encoder', 'get-encoder-error-rate', 'encoder-index-found', 'pos-pid-now', 'pos-pid-set', 'pos-pid-error', 'phase-motor', 'phase-encoder', 'phase-hall', 'phase-observer', 'observer-error', 'phase-all', 'enc-corr', 'enc-corr-en', 'enc-sample', 'setup-ah', 'setup-ah-chg', 'setup-wh', 'setup-wh-chg', 'setup-current', 'setup-current-in', 'setup-num-vescs', 'can-msg-age', 'canset-current', 'canset-current-rel', 'canset-duty', 'canset-brake', 'canset-brake-rel', 'canset-rpm', 'canset-pos', 'canget-current', 'canget-current-in', 'canget-temp-fet', 'canget-temp-motor', 'canget-speed', 'canget-dist', 'canget-ppm', 'can-list-devs', 'can-ping', 'can-local-id', 'can-update-baud', 'can-send-sid', 'can-send-eid', 'can-recv-sid', 'can-recv-eid', 'can-start', 'can-stop', 'can-use-vesc', 'canmsg-recv', 'canmsg-send', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'atan2', 'pow', 'sqrt', 'log', 'log10', 'deg2rad', 'rad2deg', 'throttle-curve', 'rand', 'rand-max', 'raw-adc-current', 'raw-adc-voltage', 'raw-mod-alpha', 'raw-mod-beta', 'raw-mod-alpha-measured', 'raw-mod-beta-measured', 'raw-hall', 'uart-write', 'uart-read-bytes', 'uart-read-until', 'uartcomm-start', 'uartcomm-stop', 'i2c-start', 'i2c-tx-rx', 'i2c-restore', 'i2c-detect-addr', 'imu-start-lsm6', 'imu-stop', 'gpio-read', 'gpio-hold', 'gpio-hold-deepsleep', 'pwm-start', 'pwm-stop', 'pwm-set-duty', 'icu-start', 'icu-width', 'icu-period', 'as5047x-init', 'as5047x-deinit', 'as5047x-angle', 'conf-set', 'conf-store', 'store-backup', 'conf-detect-foc', 'conf-set-pid-offset', 'conf-measure-res', 'conf-measure-ind', 'conf-restore-mc', 'conf-restore-app', 'conf-dc-cal', 'conf-dc-cal-set', 'conf-enc-sincos', 'conf-get-limits', 'conf-detect-lambda-enc', 'conf-detect-hall', 'loopfor', 'foldl', 'foldr', 'zipwith', 'sort', 'str-join', 'str-to-i', 'str-to-f', 'str-cmp-asc', 'str-cmp-dsc', 'str-len', 'str-find', 'to-str-delim', 'bufclear', 'buf-resize', 'load-native-lib', 'unload-native-lib', 'uavcan-last-rawcmd', 'uavcan-last-rpmcmd', 'lbm-set-quota', 'lbm-set-gc-stack-size', 'image-save', 'mutex-create', 'mutex-lock', 'mutex-unlock', 'plot-init', 'plot-add-graph', 'plot-set-graph', 'plot-send-points', 'ioboard-get-adc', 'ioboard-get-digital', 'ioboard-set-digital', 'ioboard-set-pwm', 'log-config-field', 'log-start', 'log-stop', 'log-send-f32', 'log-send-f64', 'gnss-lat-lon', 'gnss-height', 'gnss-speed', 'gnss-hdop', 'gnss-date-time', 'gnss-age', 'ublox-init', 'nmea-parse', 'set-pos-time', 'cmds-start-stop', 'cmds-proc', 'esp-now-recv', 'wifi-get-bw', 'wifi-set-bw', 'wifi-stop', 'wifi-start', 'f-connect', 'f-connect-nand', 'f-disconnect', 'f-open', 'f-close', 'f-read', 'f-readline', 'f-write', 'f-tell', 'f-seek', 'f-mkdir', 'f-rm', 'f-ls', 'f-size', 'f-rename', 'f-sync', 'f-fatinfo', 'fw-erase', 'fw-write', 'fw-reboot', 'fw-info', 'fw-data', 'fw-write-raw', 'lbm-erase', 'qml-erase', 'lbm-write', 'qml-write', 'lbm-run', 'rgbled-deinit', 'color-add', 'color-sub', 'color-scale', 'unzip', 'zip-ls', 'aes-ctr-crypt', 'sleep-deep', 'sleep-light', 'sleep-config-wakeup-pin', 'rtc-data', 'connected-wifi', 'connected-hub', 'connected-ble', 'connected-usb', 'nvs-erase', 'nvs-qml-erase', 'nvs-qml-init', 'nvs-read', 'nvs-qml-read', 'nvs-write', 'nvs-qml-write', 'nvs-qml-erase-partition', 'nvs-list', 'nvs-qml-list'
+]
 
 all_preserved_names = preserved_names + imported_names
 
@@ -122,11 +124,12 @@ def remove_unnecessary_whitespace(code):
     # Remove spaces around parentheses and quotes
     code = re.sub(r'\s*([()])\s*', r'\1', code)
     code = re.sub(r'\s*([\'"])\s*', r'\1', code)
+
     # Remove spaces before commas and preserve one space after
     code = re.sub(r'\s*,\s*', ', ', code)
     
     # Remove newlines between closing and opening parentheses
-    #code = re.sub(r'\)\s*\n\s*\(', ')(', code)
+    code = re.sub(r'\)\s*\n\s*\(', ')(', code)
     
     # Preserve newlines for readability (optional, remove if you want maximum minimization)
     #code = re.sub(r'([^\s])\(', r'\1\n(', code)
@@ -134,30 +137,12 @@ def remove_unnecessary_whitespace(code):
         '(import"pkg@://vesc_packages/lib_code_server/code_server.vescpkg"\'code-server)(read-eval-program code-server)',
         '\n(import "pkg@://vesc_packages/lib_code_server/code_server.vescpkg" \'code-server)\n(read-eval-program code-server)'
     )
-    code = code.replace(
-        'settings',
-        'settings '
-    )
-    code = code.replace(
-        '(set-remote-state',
-        '(set-remote-state '
-    )
-    code = code.replace(
-        'msg',
-        'msg '
-    )
-    code = code.replace(
-        'status',
-        'status '
-    )
-    code = code.replace(
-        '%d',
-        '%d '
-    )
-    code = code.replace(
-        '%.2f',
-        '%.2f '
-    )
+    code = code.replace('settings', 'settings ')
+    code = code.replace('(set-remote-state', '(set-remote-state ')
+    code = code.replace('msg', 'msg ')
+    code = code.replace('status', 'status ')
+    code = code.replace('%d', '%d ')
+    code = code.replace('%.2f', '%.2f ')
 	
     return code.strip()
 
@@ -187,9 +172,9 @@ def main():
         file.write(minimized_code)
 
     # Print the name mapping for reference
-    print("Name mapping:")
-    for original, short in name_mapping.items():
-        print(f"{original} -> {short}")
+    #print("Name mapping:")
+    #for original, short in name_mapping.items():
+    #    print(f"{original} -> {short}")
 
     # Calculate and print compression statistics
     bytes_saved = original_size - minimized_size
