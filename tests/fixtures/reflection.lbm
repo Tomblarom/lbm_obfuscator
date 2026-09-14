@@ -1,0 +1,13 @@
+(def assist-1 0.1)
+(def assist-2 0.2)
+(def main (lambda () assist-2))
+(def long-global 9)
+(test-assert (= (eval (str2sym (str-from-n 1 "assist-%d"))) 0.1))
+(test-assert (= (eval (read "(+ long-global 3)")) 12))
+(test-assert (= (eval (read "(main)")) 0.2))
+(test-assert (eq (sym2str 'long-global) "long-global"))
+(test-assert (eq (read "'long-global") '(quote long-global)))
+(let ((long-local 5))
+    (test-assert (= (eval (list (cons 'long-local long-local)) 'long-local) 5)))
+(test-emit (main) (sym2str 'assist-1) (read "'long-global"))
+'test-ok

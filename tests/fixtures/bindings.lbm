@@ -1,0 +1,17 @@
+(def long-name 100)
+(test-assert (= (let ((long-name 3) (other-name (+ long-name 1))) other-name) 4))
+(test-assert (= (let ((factorial (lambda (number)
+    (if (= number 0) 1 (* number (factorial (- number 1))))))) (factorial 5)) 120))
+(test-assert (= (let (((first-value . rest-values) '(4 5 6))) (+ first-value (car rest-values))) 9))
+(test-assert (= {
+    (var long-name 9)
+    (var fn-value (lambda (argument) (+ long-name argument)))
+    { (var long-name 3) (test-assert (= long-name 3)) }
+    (fn-value 2)
+} 11))
+(test-assert (= (match '(message 42) ((message (? result-value)) result-value) (_ 0)) 42))
+(defunret choose-value (long-argument) { (if (> long-argument 0) (return long-argument)) 0 })
+(test-assert (= (choose-value 5) 5))
+(test-assert (= long-name 100))
+(test-emit long-name (choose-value 5))
+'test-ok

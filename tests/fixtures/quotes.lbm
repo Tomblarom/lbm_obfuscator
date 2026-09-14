@@ -1,0 +1,9 @@
+(def long-name 17)
+(def quoted 'long-name)
+(test-assert (eq quoted (str2sym "long-name")))
+(test-assert (eq (quote (long-name . protocol-name)) '(long-name . protocol-name)))
+(test-assert (eq `(long-name ,long-name ,@(list 2 3)) '(long-name 17 2 3)))
+(defmacro keep-first (expression ignored) expression)
+(test-assert (= (keep-first (+ long-name 1) (exit-error 'not-called)) 18))
+(test-emit quoted (quote (long-name . protocol-name)) `(long-name ,long-name))
+'test-ok

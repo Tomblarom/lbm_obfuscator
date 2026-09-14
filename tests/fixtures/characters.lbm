@@ -1,0 +1,4 @@
+(def characters (list \#; \#" \#( \#) \#[ \#] \#{ \#} \#' \#` \#, \#\s \#\\ \#\0))
+(test-assert (eq characters (list 59b 34b 40b 41b 91b 93b 123b 125b 39b 96b 44b 32b 92b 0b)))
+(test-emit characters)
+'test-ok

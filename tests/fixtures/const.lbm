@@ -1,0 +1,9 @@
+(def mutable-count 0)
+@const-start
+(def constant-table '(long-name 1 2))
+(defun next-count () { (setq mutable-count (+ mutable-count 1)) mutable-count })
+@const-end
+(test-assert (eq constant-table '(long-name 1 2)))
+(test-assert (= (next-count) 1))
+(test-emit constant-table mutable-count)
+'test-ok

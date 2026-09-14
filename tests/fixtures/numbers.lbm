@@ -1,0 +1,8 @@
+(def values (list 0xFF -0x80 4294967295u32 -2147483648i32 9223372036854775807i64
+                  18446744073709551615u64 1.0e-3 2.0f64 255b 42u 42i 12.0f32 -0.0))
+(test-assert (eq (map type-of values)
+    '(type-i type-i type-u32 type-i32 type-i64 type-u64 type-float type-double type-char type-u type-i type-float type-float)))
+(test-assert (= (+ 134217727 1) -134217728)) ; Require the VESC 28-bit default integer.
+(test-assert (eq '(1 . 2) (cons 1 2)))
+(test-emit values (map type-of values) (+ 255b 1b))
+'test-ok

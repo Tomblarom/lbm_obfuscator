@@ -1,0 +1,10 @@
+(def counter 0)
+(def vt-counter 0)
+(defun update-vt () { (setq vt-counter (+ vt-counter 1)) vt-counter })
+(defun next-value () { (setq counter (+ counter 1)) counter })
+(def values (list (print (next-value)) (puts (next-value)) (update-vt)))
+(test-assert (= counter 2))
+(test-assert (= vt-counter 1))
+(test-assert (eq values '(t t 1)))
+(test-emit values counter vt-counter)
+'test-ok

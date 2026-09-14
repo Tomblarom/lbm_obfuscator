@@ -1,0 +1,9 @@
+; A comment containing " quotes and ( reader punctuation.
+(def msg-text "a;  b ( c ) [ d ] { e } status msg settings %d %.2f")
+(test-assert (eq msg-text "a;  b ( c ) [ d ] { e } status msg settings %d %.2f"))
+(def escapes "quote: \" slash: \\ tab:\t space:\s nul:\0 rest")
+(test-assert (= (bufget-u8 escapes 36) 0))
+(test-emit msg-text escapes "Grüße Ω")
+(print "  keep both edges  ")
+(puts "semicolon; is data")
+'test-ok

@@ -1,0 +1,12 @@
+; These names intentionally have no minimizer allowlist entry.
+(defun speed-age () 0.02)
+(defun pas-last-time () 0.003)
+(defun custom-firmware-extension (value) { (test-emit 'custom-firmware-extension value) value })
+(defun set-current-rel (value) { (test-emit 'set-current-rel value) t })
+(defun uart-write (buffer) { (test-emit 'uart-write buffer) t })
+(defun conf-get (key) { (test-emit 'conf-get key) 20.0 })
+(test-assert (= (custom-firmware-extension (speed-age)) 0.02))
+(test-assert (= (pas-last-time) 0.003))
+(set-current-rel (/ (conf-get 'l-current-max) 100.0))
+(uart-write [0x16 0x9a 32])
+'test-ok
