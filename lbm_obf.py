@@ -496,6 +496,73 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def inline_read_eval_imports(
+    forms: tuple[Node, ...],
+    files: dict[Path, SourceFile],
+    root: Path,
+) -> tuple[tuple[Node, ...], set[Path]]:
+    """Replace (import "X" 'sym) + (read-eval-program sym) pairs with inlined forms.
+
+    A pair qualifies when all of the following hold:
+      - The import is a top-level declaration matched to a binding symbol.
+      - Exactly one top-level (read-eval-program sym) call uses that binding.
+      - The imported file was loaded as parsed LispBM code (has forms).
+
+    Both forms are removed; the imported file's forms are inserted in place of
+    (read-eval-program sym). The set of inlined import paths is returned so the
+    caller can exclude them from import records and token counting.
+    """
+    binding_to_import: dict[str, Import] = {item.binding: item for item in files[root].imports}
+    if not binding_to_import:
+        return forms, set()
+
+    import_index: dict[str, int] = {}
+    read_eval_indices: dict[str, list[int]] = {}
+
+    for i, form in enumerate(forms):
+        h = head(form)
+        if h == "import" and isinstance(form, List) and len(form.items) == 3:
+            binding_node = form.items[2]
+            if isinstance(binding_node, Quote) and isinstance(binding_node.expr, Atom):
+                binding = binding_node.expr.token.text.lower()
+                if binding in binding_to_import:
+                    import_index[binding] = i
+        elif h == "read-eval-program" and isinstance(form, List) and len(form.items) == 2:
+            arg = form.items[1]
+            if isinstance(arg, Atom) and arg.token.kind == "symbol":
+                binding = arg.token.text.lower()
+                read_eval_indices.setdefault(binding, []).append(i)
+
+    inlineable: dict[str, tuple[int, int]] = {}
+    for binding, rev_idxs in read_eval_indices.items():
+        if len(rev_idxs) == 1 and binding in import_index and binding in binding_to_import:
+            imp = binding_to_import[binding]
+            if files[imp.path].forms:
+                inlineable[binding] = (import_index[binding], rev_idxs[0])
+
+    if not inlineable:
+        return forms, set()
+
+    remove: set[int] = set()
+    splice: dict[int, tuple[Node, ...]] = {}
+    inlined_paths: set[Path] = set()
+    for binding, (imp_idx, rev_idx) in inlineable.items():
+        imp = binding_to_import[binding]
+        inlined_paths.add(imp.path)
+        remove.add(imp_idx)
+        splice[rev_idx] = files[imp.path].forms
+
+    result: list[Node] = []
+    for i, form in enumerate(forms):
+        if i in remove:
+            continue
+        if i in splice:
+            result.extend(splice[i])
+        else:
+            result.append(form)
+    return tuple(result), inlined_paths
+
+
 @dataclass
 class Build:
     output: Path
@@ -508,7 +575,7 @@ class Build:
 
 def compile_file(input_path: Path | str, output: Path | str | None = None,
                  report_path: Path | str | None = None, *, bundle: bool = False,
-                 encoding: str = "utf-8") -> Build:
+                 inline: bool = False, encoding: str = "utf-8") -> Build:
     """Prepare and validate a complete build in memory; never write inputs."""
     if encoding not in ENCODINGS:
         raise MinimizeError(f"unsupported source encoding {encoding!r}; choose one of {ENCODINGS}")
@@ -520,10 +587,18 @@ def compile_file(input_path: Path | str, output: Path | str | None = None,
     report_path = Path(report_path).absolute() if report_path is not None else output.with_name(output.name + ".json")
     files = load_graph(root, encoding=encoding)
     source = files[root]
+
+    root_forms = source.forms
+    inlined_paths: set[Path] = set()
+    if inline:
+        root_forms, inlined_paths = inline_read_eval_imports(root_forms, files, root)
+
     artifacts: dict[Path, bytes] = {}
-    replacements: dict[int, List] = {}
+    path_replacements: dict[int, List] = {}
     import_records = []
     for item in source.imports:
+        if item.path in inlined_paths:
+            continue
         data = files[item.path].data
         destination = item.path
         if bundle:
@@ -533,22 +608,27 @@ def compile_file(input_path: Path | str, output: Path | str | None = None,
         filename = Atom(path_literal(Path(relative).as_posix(), item.path_token, encoding=encoding))
         # Canonical, standalone import lines accepted by the VESC Tool preprocessor.
         new_form = replace(item.form, items=(item.form.items[0], filename, item.form.items[2]))
-        replacements[id(item.form)] = new_form
+        path_replacements[id(item.form)] = new_form
         import_records.append({"binding": item.binding, "source": str(item.path),
                                "output_path": relative, "bytes": len(data), "sha256": sha256(data),
                                "policy": "byte-for-byte"})
-    forms = tuple(replacements.get(id(form), form) for form in source.forms)
+    forms = tuple(path_replacements.get(id(form), form) for form in root_forms)
     code = emit(forms, encoding=encoding)
     validate_vesc_imports(code, parse(code, "<generated>", encoding=encoding), "<generated>")
     output_data = code.encode(encoding)
-    tokens = [token for file in files.values() for form in file.forms for token in node_tokens(form)]
+    active_files = {p: f for p, f in files.items() if p not in inlined_paths}
+    tokens = ([token for form in forms for token in node_tokens(form)]
+              + [token for p, f in active_files.items() if p != root
+                 for form in f.forms for token in node_tokens(form)])
     counts = Counter(t.text for t in tokens if t.kind == "symbol")
     spellings: dict[str, list[str]] = defaultdict(list)
     for name in sorted(counts):
         spellings[name.lower()].append(name)
+    inlined_bytes = sum(len(files[p].data) for p in inlined_paths)
     dependencies = sum(record["bytes"] for record in import_records)
-    resolved_size = len(source.data) + dependencies
+    resolved_size = len(source.data) + dependencies + inlined_bytes
     output_size = len(output_data) + dependencies
+    mode = ("inline" if inline and inlined_paths else "") + ("bundle" if bundle else "")
     diagnostics = [{"code": "symbols-preserved", "message": "All symbols, bindings, quoted data, firmware APIs and thread strings are preserved; no renaming or expression removal."}]
     for token in tokens:
         if token.kind == "symbol" and token.text.lower() in REFLECTION:
@@ -556,7 +636,11 @@ def compile_file(input_path: Path | str, output: Path | str | None = None,
                                 "file": token.filename, "line": token.line, "column": token.column})
     if import_records:
         diagnostics.append({"code": "import-bytes-preserved", "message": "Import bytearrays and separate reader states are retained. Payload sizes include each import declaration; table/alignment/NUL overhead is excluded."})
-    for file in files.values():
+    if inlined_paths:
+        diagnostics.append({"code": "imports-inlined", "count": len(inlined_paths),
+                            "message": "These imports were inlined: the import declaration and read-eval-program call were replaced with the imported file's top-level forms.",
+                            "paths": [str(p) for p in sorted(inlined_paths)]})
+    for p, file in files.items():
         directives = [t.text for form in file.forms for t in node_tokens(form) if t.kind == "directive"]
         if directives and directives[-1] == "@const-start":
             diagnostics.append({"code": "open-const-region", "file": str(file.path),
@@ -564,11 +648,12 @@ def compile_file(input_path: Path | str, output: Path | str | None = None,
     report = {
         "schema_version": 1, "tool_version": VERSION,
         "source_encoding": encoding, "output_encoding": encoding, "report_encoding": "utf-8",
-        "input": str(root), "output": str(output), "mode": "bundle" if bundle else "references",
+        "input": str(root), "output": str(output), "mode": mode or "references",
         "source_sha256": sha256(source.data), "output_sha256": sha256(output_data),
         "inputs": [{"path": str(file.path), "bytes": len(file.data), "sha256": sha256(file.data)}
                    for file in files.values()],
         "sizes": {"source_bytes": len(source.data), "import_bytes": dependencies,
+                  "inlined_bytes": inlined_bytes,
                   "resolved_payload_bytes": resolved_size, "output_source_bytes": len(output_data),
                   "output_payload_bytes": output_size, "saved_bytes": resolved_size - output_size,
                   "saved_percent": round(100 * (resolved_size - output_size) / resolved_size, 2) if resolved_size else 0.0},
@@ -641,6 +726,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("-o", "--output", type=Path, help="new output file (default: INPUT_min.EXT)")
     parser.add_argument("--report", type=Path, help="new JSON report (default: OUTPUT.json)")
     parser.add_argument("--bundle", action="store_true", help="copy local imports byte-for-byte beside the output")
+    parser.add_argument("--inline", action="store_true",
+                        help="inline (import \"X\" 'sym) + (read-eval-program sym) pairs: "
+                             "the import declaration and call are replaced with the imported file's top-level forms")
     parser.add_argument("--encoding", choices=ENCODINGS, default="utf-8",
                         help="explicit source/output byte encoding; never guessed (default: utf-8)")
     parser.add_argument("--obfuscate", action="store_true", help=argparse.SUPPRESS)
@@ -649,7 +737,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.obfuscate:
         parser.error("unsafe legacy symbol/thread obfuscation has been removed; use deterministic minimization")
     try:
-        build = compile_file(args.input, args.output, args.report, bundle=args.bundle, encoding=args.encoding)
+        build = compile_file(args.input, args.output, args.report, bundle=args.bundle,
+                             inline=args.inline, encoding=args.encoding)
         write_build(build)
     except MinimizeError as exc:
         print(f"lbm_obf: error: {exc}", file=sys.stderr)
